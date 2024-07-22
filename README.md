@@ -12,7 +12,7 @@ This project provides an API for classifying home service descriptions into cate
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/home_service_classification.git
+git clone https://github.com/madu12/home_service_classification.git
 cd home_service_classification
 ```
 
