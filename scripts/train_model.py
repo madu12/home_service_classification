@@ -6,7 +6,7 @@ from sklearn.metrics import classification_report
 from sklearn.feature_extraction.text import TfidfVectorizer
 from gensim.models import Word2Vec
 from scripts.data_preprocessing import preprocess_text
-from scripts.save_load import save_model
+from scripts.utils import save_model
 from database.repositories import import_csv_to_db, load_initial_data, data_exists_in_db
 
 # Preprocess data

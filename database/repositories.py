@@ -180,7 +180,7 @@ def get_existing_categories():
     finally:
         session.close()
 
-def store_service_request(service_description, predicted_category_id, user_confirmed_category_id=None, is_feedback=False):
+def store_service_request(service_description, predicted_category_id=None, user_confirmed_category_id=None, is_feedback=False):
     """
     Store a service request in the database.
     

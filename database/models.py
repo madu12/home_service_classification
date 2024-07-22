@@ -24,7 +24,7 @@ class ServiceRequest(Base):
     __tablename__ = 'service_requests'
     id = Column(Integer, primary_key=True, autoincrement=True)
     service_description = Column(String, nullable=False)
-    predicted_category_id = Column(Integer, ForeignKey('categories.id'), nullable=False)
+    predicted_category_id = Column(Integer, ForeignKey('categories.id'), nullable=True)
     user_confirmed_category_id = Column(Integer, ForeignKey('categories.id'), nullable=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     is_feedback = Column(Boolean, default=False)
