@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 from pydantic import BaseModel, ValidationError
 from scripts.model_prediction import predict_category, confirm_category
 from dotenv import load_dotenv
-from scripts.generative_ai import generate_category
+from scripts.generative_ai import generate_category_by_gemini, verify_predicted_category_is_correct_by_gemini
 
 # Add the project directory to the Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -26,6 +26,8 @@ class PredictionResponse(BaseModel):
     confidence: float
     category: str
     suggested_by_gemini: str
+    verification_status_by_gemini: str
+    verification_reason_by_gemini: str
 
 class ConfirmationRequest(BaseModel):
     service_description: str
@@ -54,13 +56,19 @@ def predict():
 
         # Predict category using the trained model
         category, confidence = predict_category(request_data.service_description)
+        
         # Generate category using generative AI (Gemini)
-        suggested_by_gemini = generate_category(request_data.service_description)
+        suggested_by_gemini = generate_category_by_gemini(request_data.service_description)
 
+        # Verify if the predicted category is correct using generative AI (Gemini)
+        verification_result_by_gemini = verify_predicted_category_is_correct_by_gemini(request_data.service_description, category)
+        
         response_data = PredictionResponse(
             confidence=confidence,
             category=category,
-            suggested_by_gemini=suggested_by_gemini.lower()
+            suggested_by_gemini=suggested_by_gemini.lower(),
+            verification_status_by_gemini=verification_result_by_gemini['status'],
+            verification_reason_by_gemini=verification_result_by_gemini['reason']
         )
 
         return jsonify(response_data.dict())
