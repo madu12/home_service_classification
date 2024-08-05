@@ -4,7 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from scripts.utils import load_model
 from scripts.data_preprocessing import preprocess_text
 from database.repositories import store_service_request, get_category_id
-from scripts.train_model import get_average_word2vec
+from train_model import get_average_word2vec
 
 def predict_with_embedding(description):
     """
