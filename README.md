@@ -83,7 +83,7 @@ painting,Paint kitchen cabinets white
 ### Run the Training Script
 ```bash
 export PYTHONPATH=$(pwd)
-python scripts/train_model.py
+python train_model.py
 ```
 
 ## Running the API
