@@ -47,7 +47,16 @@ pipeline {
             steps {
                 script {
                     echo "Running tests..."
-                    sh 'source .venv/bin/activate && ./test.sh'
+                    sh '''
+                        # Activate the virtual environment
+                        source .venv/bin/activate
+                        
+                        # Ensure pytest is installed
+                        pip install pytest
+
+                        # Run the tests
+                        ./test.sh
+                    '''
                 }
             }
         }
