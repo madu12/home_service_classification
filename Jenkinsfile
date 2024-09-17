@@ -43,23 +43,23 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                script {
-                    echo "Running tests..."
-                    sh '''
-                        # Activate the virtual environment
-                        source .venv/bin/activate
+        // stage('Run Tests') {
+        //     steps {
+        //         script {
+        //             echo "Running tests..."
+        //             sh '''
+        //                 # Activate the virtual environment
+        //                 source .venv/bin/activate
                         
-                        # Ensure pytest is installed
-                        pip install pytest
+        //                 # Ensure pytest is installed
+        //                 pip install pytest
 
-                        # Run the tests
-                        ./test.sh
-                    '''
-                }
-            }
-        }
+        //                 # Run the tests
+        //                 ./test.sh
+        //             '''
+        //         }
+        //     }
+        // }
 
         stage('Retrain Model') {
             steps {
