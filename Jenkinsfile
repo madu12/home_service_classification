@@ -1,15 +1,36 @@
 pipeline {
     agent any
 
+    environment {
+        // Use Jenkins credentials to set environment variables
+        DATABASE_DRIVER = 'ODBC Driver 18 for SQL Server'
+        DATABASE_SERVER = 'localhost'
+        DATABASE_NAME = 'home-service-chatbot'
+        DATABASE_CREDENTIALS = credentials('DATABASE_CREDENTIALS')
+        GEMINI_API_KEY = credentials('GEMINI_API_KEY')
+    }
+
     stages {
         stage('Setup Environment') {
             steps {
                 script {
-                    // Load environment variables from the .env file
                     sh '''
-                        export $(grep -v '^#' .env | xargs)
-                        ./build.sh
+                        # Activate the virtual environment
+                        source .venv/bin/activate || python3 -m venv .venv && source .venv/bin/activate
+
+                        # Install required dependencies
+                        echo "Installing dependencies..."
+                        pip3 install -r requirements.txt
                     '''
+                }
+            }
+        }
+
+        stage('Preprocess Data') {
+            steps {
+                script {
+                    echo "Running data preprocessing..."
+                    sh 'python3 scripts/data_preprocessing.py'
                 }
             }
         }
@@ -17,10 +38,8 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    sh '''
-                        export $(grep -v '^#' .env | xargs)
-                        ./test.sh
-                    '''
+                    echo "Running tests..."
+                    sh './test.sh'
                 }
             }
         }
@@ -28,10 +47,8 @@ pipeline {
         stage('Retrain Model') {
             steps {
                 script {
-                    sh '''
-                        export $(grep -v '^#' .env | xargs)
-                        ./retrain.sh
-                    '''
+                    echo "Retraining the model..."
+                    sh './retrain.sh'
                 }
             }
         }
@@ -48,7 +65,7 @@ pipeline {
     post {
         always {
             echo 'Cleaning up workspace...'
-            cleanWs()
+            cleanWs()  // Clean the workspace after the job completes
         }
     }
 }
