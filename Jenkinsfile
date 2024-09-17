@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        // Use Jenkins credentials to set environment variables
         DATABASE_DRIVER = 'ODBC Driver 18 for SQL Server'
         DATABASE_SERVER = 'localhost'
         DATABASE_NAME = 'home-service-chatbot'
@@ -16,7 +15,6 @@ pipeline {
                 script {
                     // Check if virtual environment exists and create if not
                     sh '''
-                        # Check if virtual environment exists
                         if [ ! -d ".venv" ]; then
                             echo "Creating virtual environment..."
                             python3 -m venv .venv
@@ -43,29 +41,17 @@ pipeline {
             }
         }
 
-        // stage('Run Tests') {
-        //     steps {
-        //         script {
-        //             echo "Running tests..."
-        //             sh '''
-        //                 # Activate the virtual environment
-        //                 source .venv/bin/activate
-                        
-        //                 # Ensure pytest is installed
-        //                 pip install pytest
-
-        //                 # Run the tests
-        //                 ./test.sh
-        //             '''
-        //         }
-        //     }
-        // }
-
         stage('Retrain Model') {
             steps {
                 script {
                     echo "Retraining the model..."
-                    sh 'source .venv/bin/activate && ./retrain.sh'
+                    sh 'source .venv/bin/activate && python train_model.py'  // Replace with your script path
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: '**/models/*.pkl', allowEmptyArchive: true
+                    archiveArtifacts artifacts: '**/logs/*.log', allowEmptyArchive: true
                 }
             }
         }
