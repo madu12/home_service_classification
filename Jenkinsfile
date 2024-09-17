@@ -6,21 +6,29 @@ pipeline {
         DATABASE_DRIVER = 'ODBC Driver 18 for SQL Server'
         DATABASE_SERVER = 'localhost'
         DATABASE_NAME = 'home-service-chatbot'
-        DATABASE_CREDENTIALS = credentials('DATABASE_CREDENTIALS')
-        GEMINI_API_KEY = credentials('GEMINI_API_KEY')
+        DATABASE_CREDENTIALS = credentials('DATABASE_CREDENTIALS')  // Reference credentials by ID
+        GEMINI_API_KEY = credentials('GEMINI_API_KEY')  // Reference API key by ID
     }
 
     stages {
         stage('Setup Environment') {
             steps {
                 script {
+                    // Check if virtual environment exists and create if not
                     sh '''
+                        # Check if virtual environment exists
+                        if [ ! -d ".venv" ]; then
+                            echo "Creating virtual environment..."
+                            python3 -m venv .venv
+                        fi
+
                         # Activate the virtual environment
-                        source .venv/bin/activate || python3 -m venv .venv && source .venv/bin/activate
+                        source .venv/bin/activate
 
                         # Install required dependencies
                         echo "Installing dependencies..."
-                        pip3 install -r requirements.txt
+                        pip install --upgrade pip
+                        pip install -r requirements.txt
                     '''
                 }
             }
@@ -30,7 +38,7 @@ pipeline {
             steps {
                 script {
                     echo "Running data preprocessing..."
-                    sh 'python3 scripts/data_preprocessing.py'
+                    sh 'source .venv/bin/activate && python scripts/data_preprocessing.py'
                 }
             }
         }
@@ -39,7 +47,7 @@ pipeline {
             steps {
                 script {
                     echo "Running tests..."
-                    sh './test.sh'
+                    sh 'source .venv/bin/activate && ./test.sh'
                 }
             }
         }
@@ -48,7 +56,7 @@ pipeline {
             steps {
                 script {
                     echo "Retraining the model..."
-                    sh './retrain.sh'
+                    sh 'source .venv/bin/activate && ./retrain.sh'
                 }
             }
         }
