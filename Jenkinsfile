@@ -13,60 +13,45 @@ pipeline {
     stages {
         stage('Setup Virtual Environment') {
             steps {
-                dir(env.PROJECT_PATH) {
-                    script {
-                        sh '''
-                            if [ ! -d ".venv" ]; then
-                                echo "Creating virtual environment..."
-                                python3 -m venv .venv
-                            fi
-                        '''
-                    }
+                script {
+                    sh '''
+                        if [ ! -d ".venv" ]; then
+                            echo "Creating virtual environment..."
+                            python3 -m venv .venv
+                        fi
+                    '''
                 }
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                dir(env.PROJECT_PATH) {
-                    script {
-                        sh '''
-                            source .venv/bin/activate
-                            echo "Installing dependencies..."
-                            pip install --upgrade pip
-                            pip install -r requirements.txt
-                        '''
-                    }
+                script {
+                    sh '''
+                        source .venv/bin/activate
+                        echo "Installing dependencies..."
+                        pip install --upgrade pip
+                        pip install -r requirements.txt
+                    '''
                 }
+                
             }
         }
 
-        // stage('Run Tests') {
-        //     steps {
-        //         dir(env.PROJECT_PATH) {
-        //             script {
-        //                 sh 'source .venv/bin/activate && pytest tests/'
-        //             }
-        //         }
-        //     }
-        // }
-
         stage('Preprocess Data') {
             steps {
-                dir(env.PROJECT_PATH) {
-                    script {
-                        sh 'source .venv/bin/activate && python scripts/data_preprocessing.py'
-                    }
+                script {
+                    echo "Running data preprocessing..."
+                    sh 'source .venv/bin/activate && python scripts/data_preprocessing.py'
                 }
             }
         }
 
         stage('Retrain Model') {
             steps {
-                dir(env.PROJECT_PATH) {
-                    script {
-                        sh 'source .venv/bin/activate && python train_model.py'
-                    }
+                script {
+                    echo "Retraining the model..."
+                    sh 'source .venv/bin/activate && python train_model.py'
                 }
             }
             post {
@@ -75,6 +60,19 @@ pipeline {
                     archiveArtifacts artifacts: '**/models/*.csv', allowEmptyArchive: true
                     archiveArtifacts artifacts: '**/models/*.npy', allowEmptyArchive: true
                     archiveArtifacts artifacts: '**/logs/*.log', allowEmptyArchive: true
+                }
+            }
+        }
+
+        stage('Move Models to Project Folder') {
+            steps {
+                script {
+                    sh '''
+                        echo "Moving models to the project folder..."
+                        mv ${WORKSPACE}/models/*.pkl ${PROJECT_PATH}/models/
+                        mv ${WORKSPACE}/models/*.csv ${PROJECT_PATH}/models/
+                        mv ${WORKSPACE}/models/*.npy ${PROJECT_PATH}/models/
+                    '''
                 }
             }
         }
