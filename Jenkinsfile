@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PROJECT_PATH = credentials('PROJECT_PATH')
+        PROJECT_PATH = '/Users/madhushan/Sites/home_service_classification'  // Define the project path directly
         DATABASE_DRIVER = 'ODBC Driver 18 for SQL Server'
         DATABASE_SERVER = 'localhost'
         DATABASE_NAME = 'home-service-chatbot'
@@ -34,7 +34,6 @@ pipeline {
                         pip install -r requirements.txt
                     '''
                 }
-                
             }
         }
 
@@ -68,6 +67,9 @@ pipeline {
             steps {
                 script {
                     sh '''
+                        echo "Creating target directory if it does not exist..."
+                        mkdir -p ${PROJECT_PATH}/models
+
                         echo "Moving models to the project folder..."
                         mv ${WORKSPACE}/models/*.pkl ${PROJECT_PATH}/models/
                         mv ${WORKSPACE}/models/*.csv ${PROJECT_PATH}/models/
