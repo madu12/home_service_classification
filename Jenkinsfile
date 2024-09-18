@@ -71,9 +71,13 @@ pipeline {
                         mkdir -p ${PROJECT_PATH}/models
 
                         echo "Moving models to the project folder..."
-                        mv "${WORKSPACE}/models/*.pkl" "${PROJECT_PATH}/models/" || echo "No .pkl files to move"
-                        mv "${WORKSPACE}/models/*.csv" "${PROJECT_PATH}/models/" || echo "No .csv files to move"
-                        mv "${WORKSPACE}/models/*.npy" "${PROJECT_PATH}/models/" || echo "No .npy files to move"
+                        cp "${WORKSPACE}/models/final_classifier.pkl" "${PROJECT_PATH}/models/" || echo "No final_classifier.pkl file to copy"
+                        cp "${WORKSPACE}/models/final_word2vec_model.pkl" "${PROJECT_PATH}/models/" || echo "No final_word2vec_model.pkl file to copy"
+                        cp "${WORKSPACE}/models/tfidf_vectorizer.pkl" "${PROJECT_PATH}/models/" || echo "No tfidf_vectorizer.pkl file to copy"
+                        cp "${WORKSPACE}/models/vectorized_descriptions_combined.pkl" "${PROJECT_PATH}/models/" || echo "No vectorized_descriptions_combined.pkl file to copy"
+                        cp "${WORKSPACE}/models/descriptions_combined.csv" "${PROJECT_PATH}/models/" || echo "No descriptions_combined.csv file to copy"
+                        cp "${WORKSPACE}/models/combined_feature_dims.npy" "${PROJECT_PATH}/models/" || echo "No combined_feature_dims.npy file to copy"
+                        cp "${WORKSPACE}/models/vectorized_descriptions_combined.npy" "${PROJECT_PATH}/models/" || echo "No vectorized_descriptions_combined.npy file to copy"
                     '''
                 }
             }
