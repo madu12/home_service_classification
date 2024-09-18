@@ -63,21 +63,21 @@ pipeline {
             }
         }
 
-        // stage('Move Models to Project Folder') {
-        //     steps {
-        //         script {
-        //             sh '''
-        //                 echo "Creating target directory if it does not exist..."
-        //                 mkdir -p ${PROJECT_PATH}/models
+        stage('Move Models to Project Folder') {
+            steps {
+                script {
+                    sh '''
+                        echo "Creating target directory if it does not exist..."
+                        mkdir -p ${PROJECT_PATH}/models
 
-        //                 echo "Moving models to the project folder..."
-        //                 mv ${WORKSPACE}/models/*.pkl ${PROJECT_PATH}/models/
-        //                 mv ${WORKSPACE}/models/*.csv ${PROJECT_PATH}/models/
-        //                 mv ${WORKSPACE}/models/*.npy ${PROJECT_PATH}/models/
-        //             '''
-        //         }
-        //     }
-        // }
+                        echo "Moving models to the project folder..."
+                        mv ${WORKSPACE}/models/*.pkl ${PROJECT_PATH}/models/ || echo "No .pkl files to move"
+                        mv ${WORKSPACE}/models/*.csv ${PROJECT_PATH}/models/ || echo "No .csv files to move"
+                        mv ${WORKSPACE}/models/*.npy ${PROJECT_PATH}/models/ || echo "No .npy files to move"
+                    '''
+                }
+            }
+        }
 
         stage('Deploy Model') {
             when {
