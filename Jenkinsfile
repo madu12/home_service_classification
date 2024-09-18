@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Setup Virtual Environment') {
             steps {
-                dir("${PROJECT_PATH}") {
+                dir(env.PROJECT_PATH) {
                     script {
                         sh '''
                             if [ ! -d ".venv" ]; then
@@ -28,7 +28,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                dir("${PROJECT_PATH}") {
+                dir(env.PROJECT_PATH) {
                     script {
                         sh '''
                             source .venv/bin/activate
@@ -43,7 +43,7 @@ pipeline {
 
         // stage('Run Tests') {
         //     steps {
-        //         dir("${PROJECT_PATH}") {
+        //         dir(env.PROJECT_PATH) {
         //             script {
         //                 sh 'source .venv/bin/activate && pytest tests/'
         //             }
@@ -53,7 +53,7 @@ pipeline {
 
         stage('Preprocess Data') {
             steps {
-                dir("${PROJECT_PATH}") {
+                dir(env.PROJECT_PATH) {
                     script {
                         sh 'source .venv/bin/activate && python scripts/data_preprocessing.py'
                     }
@@ -63,7 +63,7 @@ pipeline {
 
         stage('Retrain Model') {
             steps {
-                dir("${PROJECT_PATH}") {
+                dir(env.PROJECT_PATH) {
                     script {
                         sh 'source .venv/bin/activate && python train_model.py'
                     }
@@ -84,7 +84,7 @@ pipeline {
                 expression { return currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
             steps {
-                dir("${PROJECT_PATH}") {
+                dir(env.PROJECT_PATH) {
                     script {
                         echo "Deployment handled in retrain script."
                     }
