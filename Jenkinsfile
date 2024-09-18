@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        PROJECT_PATH = '/Sites/home_service_classification'
         DATABASE_DRIVER = 'ODBC Driver 18 for SQL Server'
         DATABASE_SERVER = 'localhost'
         DATABASE_NAME = 'home-service-chatbot'
@@ -10,41 +11,62 @@ pipeline {
     }
 
     stages {
-        stage('Setup Environment') {
+        stage('Setup Virtual Environment') {
             steps {
-                script {
-                    sh '''
-                        if [ ! -d ".venv" ]; then
-                            echo "Creating virtual environment..."
-                            python3 -m venv .venv
-                        fi
-
-                        # Activate the virtual environment
-                        source .venv/bin/activate
-
-                        # Install required dependencies
-                        echo "Installing dependencies..."
-                        pip install --upgrade pip
-                        pip install -r requirements.txt
-                    '''
+                dir("${PROJECT_PATH}") {
+                    script {
+                        sh '''
+                            if [ ! -d ".venv" ]; then
+                                echo "Creating virtual environment..."
+                                python3 -m venv .venv
+                            fi
+                        '''
+                    }
                 }
             }
         }
 
+        stage('Install Dependencies') {
+            steps {
+                dir("${PROJECT_PATH}") {
+                    script {
+                        sh '''
+                            source .venv/bin/activate
+                            echo "Installing dependencies..."
+                            pip install --upgrade pip
+                            pip install -r requirements.txt
+                        '''
+                    }
+                }
+            }
+        }
+
+        // stage('Run Tests') {
+        //     steps {
+        //         dir("${PROJECT_PATH}") {
+        //             script {
+        //                 sh 'source .venv/bin/activate && pytest tests/'
+        //             }
+        //         }
+        //     }
+        // }
+
         stage('Preprocess Data') {
             steps {
-                script {
-                    echo "Running data preprocessing..."
-                    sh 'source .venv/bin/activate && python scripts/data_preprocessing.py'
+                dir("${PROJECT_PATH}") {
+                    script {
+                        sh 'source .venv/bin/activate && python scripts/data_preprocessing.py'
+                    }
                 }
             }
         }
 
         stage('Retrain Model') {
             steps {
-                script {
-                    echo "Retraining the model..."
-                    sh 'source .venv/bin/activate && python train_model.py'
+                dir("${PROJECT_PATH}") {
+                    script {
+                        sh 'source .venv/bin/activate && python train_model.py'
+                    }
                 }
             }
             post {
@@ -58,17 +80,27 @@ pipeline {
         }
 
         stage('Deploy Model') {
+            when {
+                expression { return currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
             steps {
-                script {
-                    echo "Deployment handled in retrain script."
+                dir("${PROJECT_PATH}") {
+                    script {
+                        echo "Deployment handled in retrain script."
+                    }
                 }
             }
         }
     }
 
     post {
+        success {
+            echo 'Build succeeded!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
         always {
-            echo 'Cleaning up workspace...'
             cleanWs()
         }
     }
