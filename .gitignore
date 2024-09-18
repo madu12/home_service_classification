@@ -74,8 +74,8 @@ cython_debug/
 # Log files
 *.log
 
-# # Models and vectorizers
-# models/
+# Models and vectorizers
+models/
 
-# # Data files
-# data/
+# Data files
+data/
