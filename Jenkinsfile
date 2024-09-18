@@ -5,15 +5,14 @@ pipeline {
         DATABASE_DRIVER = 'ODBC Driver 18 for SQL Server'
         DATABASE_SERVER = 'localhost'
         DATABASE_NAME = 'home-service-chatbot'
-        DATABASE_CREDENTIALS = credentials('DATABASE_CREDENTIALS')  // Reference credentials by ID
-        GEMINI_API_KEY = credentials('GEMINI_API_KEY')  // Reference API key by ID
+        DATABASE_CREDENTIALS = credentials('DATABASE_CREDENTIALS')
+        GEMINI_API_KEY = credentials('GEMINI_API_KEY')
     }
 
     stages {
         stage('Setup Environment') {
             steps {
                 script {
-                    // Check if virtual environment exists and create if not
                     sh '''
                         if [ ! -d ".venv" ]; then
                             echo "Creating virtual environment..."
@@ -45,12 +44,14 @@ pipeline {
             steps {
                 script {
                     echo "Retraining the model..."
-                    sh 'source .venv/bin/activate && python train_model.py'  // Replace with your script path
+                    sh 'source .venv/bin/activate && python train_model.py'
                 }
             }
             post {
                 always {
                     archiveArtifacts artifacts: '**/models/*.pkl', allowEmptyArchive: true
+                    archiveArtifacts artifacts: '**/models/*.csv', allowEmptyArchive: true
+                    archiveArtifacts artifacts: '**/models/*.npy', allowEmptyArchive: true
                     archiveArtifacts artifacts: '**/logs/*.log', allowEmptyArchive: true
                 }
             }
@@ -68,7 +69,7 @@ pipeline {
     post {
         always {
             echo 'Cleaning up workspace...'
-            cleanWs()  // Clean the workspace after the job completes
+            cleanWs()
         }
     }
 }
