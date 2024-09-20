@@ -41,9 +41,15 @@ def fetch_all_service_requests():
     """
     session = create_session()
     query = """
-    SELECT sr.service_description, c.name as category
-    FROM service_requests sr
-    JOIN categories c ON sr.predicted_category_id = c.id
+    SELECT 
+        sr.service_description, 
+        COALESCE(c_user.name, c_pred.name) AS category
+    FROM 
+        service_requests sr
+    LEFT JOIN 
+        categories c_pred ON sr.predicted_category_id = c_pred.id
+    LEFT JOIN 
+        categories c_user ON sr.user_confirmed_category_id = c_user.id
     """
     try:
         data = pd.read_sql(query, session.bind)
