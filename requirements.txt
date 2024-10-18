@@ -13,3 +13,4 @@ sqlalchemy==2.0.31
 scipy==1.11.4
 google-generativeai==0.7.2
 pytest==8.3.3
+flasgger==0.9.7.1
