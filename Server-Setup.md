@@ -79,7 +79,7 @@ sudo vim /etc/nginx/sites-available/home_service_classification
 ```bash
 server {
     listen 80;
-    server_name 51.20.9.94; # Replace this with your server's public IP
+    server_name 16.171.161.214; # Replace this with your server's public IP
 
     location / {
         proxy_pass http://127.0.0.1:5001;
