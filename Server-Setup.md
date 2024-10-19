@@ -44,7 +44,7 @@ ls /usr/lib/x86_64-linux-gnu/ | grep libodbc
 ```bash
 vim .env
 ```
-Add the following lines to .env:
+Add the following lines to .env: (Replace this with your details)
 ```bash
 DATABASE_DRIVER=ODBC Driver 18 for SQL Server
 DATABASE_SERVER=home-service-db.cd8o0gcak2fi.eu-north-1.rds.amazonaws.com
