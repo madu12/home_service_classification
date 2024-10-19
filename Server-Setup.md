@@ -118,7 +118,7 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 ```
-## 14. Enable the Nginx Site and Reload
+## 14. Start and enable Gunicorn:
 ```bash
 sudo systemctl start gunicorn
 sudo systemctl enable gunicorn
