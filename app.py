@@ -80,11 +80,11 @@ def predict():
                         type: number
                     category:
                         type: string
-                    suggested_by_gemini:
+                    suggested_by_gen_ai:
                         type: string
-                    verification_status_by_gemini:
+                    verification_status_by_gen_ai:
                         type: string
-                    verification_reason_by_gemini:
+                    verification_reason_by_gen_ai:
                         type: string
         422:
             description: Validation Error

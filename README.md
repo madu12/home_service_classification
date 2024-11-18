@@ -119,7 +119,7 @@ python app.py
     {
         "category": "painting",
         "confidence": 0.69,
-        "suggested_by_gemini": "painting"
+        "suggested_by_gen_ai": "painting"
     }
     ```
 
