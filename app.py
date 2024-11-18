@@ -29,9 +29,9 @@ class PredictionRequest(BaseModel):
 class PredictionResponse(BaseModel):
     confidence: float
     category: str
-    suggested_by_gemini: str
-    verification_status_by_gemini: str
-    verification_reason_by_gemini: str
+    suggested_by_gen_ai: str
+    verification_status_by_gen_ai: str
+    verification_reason_by_gen_ai: str
 
 class ConfirmationRequest(BaseModel):
     service_description: str
@@ -92,34 +92,41 @@ def predict():
             description: Internal Server Error
     """
     try:
-        data = request.json
+        data = request.get_json()
+        
         # Validate request data
-        try:
-            request_data = PredictionRequest(**data)
-        except ValidationError as e:
-            return jsonify(e.errors()), 422
+        if not data or 'service_description' not in data or not data['service_description'].strip():
+            return jsonify({"error": "Invalid input. 'service_description' is required and cannot be empty."}), 422
 
+        # Process the input
+        service_description = data['service_description'].strip()
+        
         # Predict category using the trained model
-        category, confidence = predict_category(request_data.service_description)
+        category, confidence = predict_category(service_description)
         
         # Generate category using generative AI (Gemini)
-        suggested_by_gemini = generate_category_by_gemini(request_data.service_description)
+        suggested_by_gemini = generate_category_by_gemini(service_description)
 
         # Verify if the predicted category is correct using generative AI (Gemini)
         verification_result_by_gemini = verify_predicted_category_is_correct_by_gemini(
-            request_data.service_description, category)
-
-        response_data = PredictionResponse(
-            confidence=confidence,
-            category=category,
-            suggested_by_gemini=suggested_by_gemini.lower(),
-            verification_status_by_gemini=verification_result_by_gemini['status'],
-            verification_reason_by_gemini=verification_result_by_gemini['reason']
+            service_description, category
         )
 
-        return jsonify(response_data.dict())
+        response_data = {
+            "confidence": confidence,
+            "category": category,
+            "suggested_by_gen_ai": suggested_by_gemini.lower(),
+            "verification_status_by_gen_ai": verification_result_by_gemini.get('status', 'unknown'),
+            "verification_reason_by_gen_ai": verification_result_by_gemini.get('reason', 'N/A')
+        }
+
+        return jsonify(response_data), 200
+
+    except ValidationError as e:
+        return jsonify(e.errors()), 422
     except Exception as e:
-        return jsonify({"detail": str(e)}), 500
+        return jsonify({"detail": "Internal Server Error: " + str(e)}), 500
+
 
 # Endpoint for confirming a predicted category
 @app.route("/confirm_category", methods=["POST"])
